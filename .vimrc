@@ -3,15 +3,20 @@ set nocompatible
 set nowrap
 set wildmenu
 set showmatch
-set hlsearch
+set incsearch           " Enable incremental search
+set hlsearch            " Enable highlight search
 set bs=indent,eol,start
 
 set autoindent
 set smartindent
-set ts=4
+set ts=4                " How many columns of whitespace a \t is worth   
 set sts=4
-set shiftwidth=4
-set expandtab
+set shiftwidth=4        " How many columns of whitespace a "level of indentation" is worth
+set expandtab           " Use space when tabbing
+
+set termwinsize=12x0    " Set terminal size
+set splitbelow          " Always split below
+set mouse=a             " Enable mouse drag onwindow splits
 
 filetype plugin indent on 
 
@@ -19,12 +24,33 @@ filetype plugin indent on
 " vim-Plug Plugin List
 call plug#begin('~/.vim/plugged')
 
+" 언어팩 모음 
+Plug 'sheerun/vim-polyglot'
+
+" 자동 짝맞추기  
+Plug 'jiangmiao/auto-pairs'
+
+" 파일 탐색
+Plug 'preservim/nerdtree'
+
+" 파일 구조
+Plug 'preservim/tagbar'
+
+" 파일 검색 (파일에 포함된 문자열)  
+Plug 'dyng/ctrlsf.vim'
+
+" Switching between .h and .cpp files
+Plug 'derekwyatt/vim-fswitch'
+
+" Pulling prototypes into implementation files
+Plug 'derekwyatt/vim-protodef'
+
 " 자동완성을 해주는 Plugin이다. 많은 Launguge를 지원하고 :CoCInstall
 " coc-<lang> 으로 지원되는 Languge 설치가 가능
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 " 유명한 플러그인들
-"Plug 'majutsushi/tagbar'
+" Plug 'majutsushi/tagbar'
 Plug 'vim-airline/vim-airline'
 Plug 'tpope/vim-fugitive'
 
@@ -45,6 +71,47 @@ Plug 'junegunn/fzf.vim'
 
 " Initialize plugin system
 call plug#end()
+
+" 자동 짝맞추기 토글 단축키
+let g:AutoPairsShortcutToggle = '<C-P>'
+
+" tagbar settings
+let g:tagbar_autofocus = 1					" Focus the panel when opening it
+let g:tagbar_autoshowtag = 1				" Highlight the active tag
+let g:tagbar_position = 'botright vertical' " Make panel vertical and place on the right
+" Mapping to open and close the panel
+nmap <F8> :TagbarToggle<CR>					
+
+" ctrlsf settings
+let g:ctrlsf_backend = 'rg'						" Use the ack tool as the backend
+let g:ctrlsf_auto_close = { "normal":0, "compact":0 }	" Auto close the results panel when opening a file
+let g:ctrlsf_auto_focus = { "at":"start" }			" Immediately switch focus the the search window
+let g:ctrlsf_auto_preview = 0						" Don't open the preview window automatically
+let g:ctrlsf_case_sensitive = 'smart'				" Use the smart case sensitivity search scheme
+let g:ctrlsf_default_view = 'normal'				" Normal mode, not compact mode
+let g:ctrlsf_regex_pattern = 0						" Use absolute search by default
+let g:ctrlsf_position = 'right'						" Position of the search window
+let g:ctrlsf_winsize = '46'							" Width or height of search window
+let g:ctrlsf_default_root = 'cwd'					" Search from the current working directory
+" (Ctrl-F) Open search prompt (Normal Mode)
+nmap <C-F>f <Plug>CtrlSFPrompt
+" (Ctrl-F + f) Open search prompt with selection (Visual Mode)
+xmap <C-F>f <Plug>CtrlSFVwordPath
+" (Ctrl-F + F) Perform search with selection (Visual Mode)
+xmap <C-F>F <Plug>CtrlSFVwordExec
+" (Ctrl-F + n) Open search prompt with current word (Normal Mode)
+nmap <C-F>n <Plug>CtrlSFCwordPath
+" (Ctrl-F + o) Open CtrlSF window (Normal Mode)
+nmap <C-F>o :CtrlSFOpen<CR>
+" (Ctrl-F + t) Toggle CtrlSF window (Normal Mode)
+nnoremap <C-F>t :CtrlSFToggle<CR>
+" (Ctrl-F + t) Toggle CtrlSF window (Insert Mode)
+inoremap <C-F>t <Esc>:CtrlSFToggle<CR>
+
+" FSwitch setting
+au! BufEnter *.cpp let b:fswitchdst = 'hpp,h'
+au! BufEnter *.h let b:fswitchdst = 'cpp,c'
+nmap <C-Z> :vsplit <bar> :wincmd l <bar> :FSRight<CR>
 
 " For Go lang
 	" 저장할 때 자동으로 formatting 및 import from https://johngrib.github.io/
