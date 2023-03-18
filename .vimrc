@@ -18,6 +18,8 @@ set termwinsize=12x0    " Set terminal size
 set splitbelow          " Always split below
 set mouse=a             " Enable mouse drag onwindow splits
 
+set signcolumn=yes      " Make Vim always render the sign column (for ycm)
+
 filetype plugin indent on 
 
 
@@ -45,20 +47,18 @@ Plug 'derekwyatt/vim-fswitch'
 " Pulling prototypes into implementation files
 Plug 'derekwyatt/vim-protodef'
 
-" 자동완성을 해주는 Plugin이다. 많은 Launguge를 지원하고 :CoCInstall
-" coc-<lang> 으로 지원되는 Languge 설치가 가능
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" YCM, 자동완성 플러그인
+Plug 'valloric/youcompleteme', {'do': 'python3 ./install.py --clang-completer --go-completer'}
+
+" 비동기 외부 명령 실행 플러그인  
+Plug 'tpope/vim-dispatch'
 
 " 유명한 플러그인들
-" Plug 'majutsushi/tagbar'
 Plug 'vim-airline/vim-airline'
 Plug 'tpope/vim-fugitive'
 
 " Vim-go를 사용하기 위한 Plugin
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-
-" 나만의 자동 완성을 만들수 있는 Plugin 이다. 
-"Plug 'SirVer/ultisnips'
 
 " 편의
 "Plug 'milkypostman/vim-togglelist'
@@ -72,8 +72,11 @@ Plug 'junegunn/fzf.vim'
 " Initialize plugin system
 call plug#end()
 
-" 자동 짝맞추기 토글 단축키
+" auto-pair settings 
 let g:AutoPairsShortcutToggle = '<C-P>'
+
+" NERDTree settings
+nmap <F2> :NERDTreeToggle<CR>
 
 " tagbar settings
 let g:tagbar_autofocus = 1					" Focus the panel when opening it
@@ -113,6 +116,55 @@ au! BufEnter *.cpp let b:fswitchdst = 'hpp,h'
 au! BufEnter *.h let b:fswitchdst = 'cpp,c'
 nmap <C-Z> :vsplit <bar> :wincmd l <bar> :FSRight<CR>
 
+" YCM setting
+"let g:ycm_key_list_select_completion = ['<C-n>']
+"let g:ycm_key_list_previous_completion=['<C-p>']
+"let g:ycm_key_list_stop_completion = ['<C-x>']
+
+let g:ycm_autoclose_preview_window_after_insertion = 1		" Close prevew window after completing the insertion
+let g:ycm_autoclose_preview_window_after_completion = 1
+
+let g:ycm_server_python_interpreter = 'C:\Users\heoja\AppData\Local\Programs\Python\Python311\python.exe'
+let g:ycm_collect_identifiers_from_comments_and_strings = 1
+let g:ycm_complete_in_strings = 1
+let g:ycm_complete_in_comments = 1
+let g:ycm_min_num_of_chars_for_completion = 1
+let g:ycm_filetype_blacklist = {}
+let g:ycm_confirm_extra_conf = 0				" Don't confirm python conf
+let g:ycm_always_populate_location_list = 1		" Always populate diagnostics list
+let g:ycm_auto_trigger = 1						" Enable completion menu
+let g:ycm_show_diagnostic_ui = 1				" Show diagnostic display features
+let g:ycm_enable_diagnostic_signs = 1			" Display icons in Vim's gutter, error, warnings
+let g:ycm_enable_diagnostic_highlighting = 1	" Highlight regions of diagnostic text
+let g:ycm_echo_current_diagnostic = 1			" Echo line's diagnostic that cursor is on
+
+" vim-dispatch settings
+" Open vim-dispatch window and scroll to bottom
+nnoremap	 <C-m>m		:Copen<CR> <bar> G
+
+" Build debug and release targets
+nnoremap	<C-m>bd		:Dispatch! make -C build/Debug<CR>
+nnoremap	<C-m>br		:Dispatch! make -C build/Release<CR>
+
+" Map <F6> to the Debug executable with passed filename
+function SetBinaryDebug(filename)
+	let bpath = getcwd() . "/bin/Debug/" . a:filename
+	execute "nnoremap <F6> :Dispatch "
+				\ bpath
+				\ . " <CR> <bar> :Copen<CR>"
+	echo "<F6> will run: " . bpath
+endfunction
+
+" Map <F7> to the Release executable with passed filename
+function SetBinaryRelease(filename)
+	let bpath = getcwd() . "/bin/Release/" . a:filename
+	execute "nnoremap <F7> :Dispatch "
+				\ bpath
+				\ . " <CR> <bar> :Copen<CR>"
+	echo "<F7> will run: " . bpath
+endfunction
+
+
 " For Go lang
 	" 저장할 때 자동으로 formatting 및 import from https://johngrib.github.io/
 	let g:go_fmt_command = "goimports"
@@ -143,11 +195,11 @@ nmap <C-Z> :vsplit <bar> :wincmd l <bar> :FSRight<CR>
 	autocmd FileType go nnoremap <Tab>r :GoRun<CR>
 	autocmd FileType go nnoremap <Tab><Tab>r :GoRun %<CR>
 	 
-	 autocmd FileType go nnoremap <Tab>t :GoTest<CR>
-	 autocmd FileType go nnoremap <Tab><Tab>t :GoTestFunc<CR>
-	 autocmd FileType go nnoremap <Tab>c :GoCoverageToggle<CR>
+	autocmd FileType go nnoremap <Tab>t :GoTest<CR>
+	autocmd FileType go nnoremap <Tab><Tab>t :GoTestFunc<CR>
+	autocmd FileType go nnoremap <Tab>c :GoCoverageToggle<CR>
 
-" Font Setting
+" gvim font setting
 if has("gui_running")
   set encoding=utf-8  
 
